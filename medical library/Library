@@ -1,0 +1,966 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="A free university medical student library with notes, medical MCQs and revision resources.">
+<title>MedLibrary | Free Medical Student Library</title>
+
+<style>
+:root {
+  --green: #087f68;
+  --dark: #173b33;
+  --light: #f2f8f5;
+  --muted: #63766e;
+  --border: #dce8e2;
+  --white: #ffffff;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js"></script>
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--dark);
+  background: #fff;
+  line-height: 1.6;
+}
+
+button, input, select { font: inherit; }
+
+a { color: var(--green); }
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 7%;
+  border-bottom: 1px solid var(--border);
+  background: white;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.logo {
+  font-size: 25px;
+  font-weight: 800;
+  text-decoration: none;
+  color: var(--dark);
+}
+
+.logo span { color: var(--green); }
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+nav a {
+  text-decoration: none;
+  color: var(--dark);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+nav a:hover { color: var(--green); }
+
+.hero {
+  padding: 85px 7%;
+  background: linear-gradient(120deg, #e6f6ee, #f7fbf9);
+}
+
+.eyebrow {
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.hero h1 {
+  font-size: clamp(36px, 6vw, 62px);
+  line-height: 1.12;
+  margin: 15px 0;
+}
+
+.hero p {
+  max-width: 650px;
+  color: var(--muted);
+  font-size: 17px;
+}
+
+.btn {
+  display: inline-block;
+  border: none;
+  border-radius: 8px;
+  background: var(--green);
+  color: white;
+  padding: 12px 18px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn:hover { background: #066653; }
+
+.btn:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+.section { padding: 45px 7%; }
+
+.section h2 {
+  margin: 0 0 5px;
+  font-size: 28px;
+}
+
+.muted { color: var(--muted); }
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  padding: 25px 7%;
+}
+
+.stat {
+  background: var(--light);
+  border-radius: 12px;
+  text-align: center;
+  padding: 20px 10px;
+}
+
+.stat strong {
+  display: block;
+  color: var(--green);
+  font-size: 25px;
+}
+
+.stat span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 20px 0;
+}
+
+.chip {
+  padding: 9px 14px;
+  border: 1px solid var(--border);
+  border-radius: 25px;
+  background: white;
+  color: var(--dark);
+  cursor: pointer;
+}
+
+.chip.active, .chip:hover {
+  background: var(--green);
+  border-color: var(--green);
+  color: white;
+}
+
+.search {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  margin: 16px 0 5px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.card {
+  border: 1px solid var(--border);
+  padding: 20px;
+  border-radius: 12px;
+  background: white;
+}
+
+.card:hover {
+  box-shadow: 0 5px 20px #173b3310;
+}
+
+.tag {
+  color: var(--green);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  font-weight: 800;
+}
+
+.card h3 { margin: 10px 0 5px; }
+
+.card p {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.card a {
+  display: inline-block;
+  margin-top: 8px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.panel {
+  background: var(--light);
+  border-radius: 14px;
+  padding: 24px;
+  margin-top: 20px;
+}
+
+.field {
+  display: block;
+  width: 100%;
+  max-width: 420px;
+  padding: 12px;
+  margin: 10px 0 18px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: white;
+}
+
+.question {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 17px 0;
+}
+
+.question h3 { font-size: 17px; }
+
+.option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px;
+  margin: 8px 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.option:hover { background: var(--light); }
+
+.option input { margin-top: 5px; }
+
+.option.correct {
+  border-color: #16834b;
+  background: #e8f8ed;
+}
+
+.option.wrong {
+  border-color: #d14b4b;
+  background: #fff0f0;
+}
+
+.feedback {
+  background: var(--light);
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+#quiz-result {
+  font-size: 19px;
+  font-weight: 800;
+  margin: 18px 0;
+}
+
+.about { background: var(--light); }
+
+.about p { max-width: 760px; }
+
+footer {
+  text-align: center;
+  padding: 25px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+[hidden] { display: none !important; }
+
+@media (max-width: 650px) {
+  header {
+    position: static;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  nav { gap: 12px; }
+
+  .hero { padding: 55px 7%; }
+
+  .stats { padding-top: 15px; }
+
+  .stat strong { font-size: 20px; }
+
+  .section { padding-top: 32px; padding-bottom: 32px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <a class="logo" href="#">Med<span>Library</span></a>
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#resources">Study Notes</a>
+    <a href="#mcqs">MCQs</a>
+    <a href="#about">About</a>
+  </nav>
+</header>
+
+<main>
+<section class="hero" id="home">
+  <p class="eyebrow">LEARN • PRACTISE • EXCEL</p>
+  <h1>Your University<br>Medical Library</h1>
+  <p>
+    A free learning space for medical students. Explore study notes,
+    revise important concepts and test your knowledge with MCQs.
+  </p>
+  <a class="btn" href="#resources">Explore Study Notes</a>
+  <a class="btn" href="#mcqs" style="margin-left:8px">Practise MCQs</a>
+</section>
+
+<section class="stats">
+  <div class="stat">
+    <strong id="resource-total">0</strong>
+    <span>Study resources</span>
+  </div>
+  <div class="stat">
+    <strong id="question-total">0</strong>
+    <span>Practice questions</span>
+  </div>
+  <div class="stat">
+    <strong>FREE</strong>
+    <span>Student access</span>
+  </div>
+</section>
+
+<section class="section" id="resources">
+  <h2>Medical Study Resources</h2>
+  <p class="muted">
+    Search the library or select a subject to find relevant resources.
+  </p>
+
+  <input id="resource-search" class="search" type="search"
+    placeholder="Search notes, topics or subjects..."
+    aria-label="Search study resources">
+
+  <div class="filters" id="resource-filters"></div>
+  <p id="resource-count" class="muted" aria-live="polite"></p>
+  <div id="resource-grid" class="grid"></div>
+</section>
+
+<section class="section" id="mcqs">
+  <h2>Medical MCQ Practice</h2>
+  <p class="muted">
+    Answer the questions, submit your responses and review explanations.
+  </p>
+
+  <div class="panel">
+    <label for="mcq-subject"><strong>Choose a subject</strong></label>
+    <select id="mcq-subject" class="field">
+      <option value="All">All subjects</option>
+      <option value="Anatomy">Anatomy</option>
+      <option value="Physiology">Physiology</option>
+      <option value="Pathology">Pathology</option>
+      <option value="Pharmacology">Pharmacology</option>
+      <option value="Microbiology">Microbiology</option>
+      <option value="Clinical Medicine">Clinical Medicine</option>
+      <option value="Biochemistry">Biochemistry</option>
+    </select>
+
+    <label for="question-limit"><strong>Questions per quiz</strong></label>
+    <select id="question-limit" class="field">
+      <option value="5">5 questions</option>
+      <option value="10">10 questions</option>
+      <option value="20">20 questions</option>
+      <option value="all">All available questions</option>
+    </select>
+
+    <p id="quiz-progress" class="muted"></p>
+    <div id="quiz-container"></div>
+    <p id="quiz-result" aria-live="polite"></p>
+
+    <button class="btn" id="submit-quiz">Submit Answers</button>
+    <button class="btn" id="next-quiz" hidden>Try Another Quiz</button>
+  </div>
+</section>
+
+<section class="section about" id="about">
+  <h2>About MedLibrary</h2>
+  <p>
+    MedLibrary is designed to make medical learning resources more
+    accessible to university students. Use the materials for study
+    and revision, and consult current clinical guidelines and qualified
+    educators when learning about patient care.
+  </p>
+  <p class="muted">
+    Only upload materials you created, have permission to share,
+    or that are legally available for redistribution.
+  </p>
+</section>
+</main>
+
+<footer>
+  <p>© <span id="year"></span> MedLibrary. Free educational resources.</p>
+  <p>Educational use only. Not a substitute for clinical supervision.</p>
+</footer>
+
+<script>
+"use strict";
+
+/*
+  ADD YOUR REAL PDF FILES TO A FOLDER NAMED "pdfs".
+  Update each file path below to match your PDF filename.
+*/
+const resources = [
+  {
+    title: "Introduction to Human Anatomy",
+    subject: "Anatomy",
+    description: "Anatomical terminology, body organization and systems.",
+    file: "pdfs/anatomy.pdf"
+  },
+  {
+    title: "Human Physiology",
+    subject: "Physiology",
+    description: "Normal body functions and physiological processes.",
+    file: "pdfs/physiology.pdf"
+  },
+  {
+    title: "General Pathology",
+    subject: "Pathology",
+    description: "Cell injury, inflammation and mechanisms of disease.",
+    file: "pdfs/pathology.pdf"
+  },
+  {
+    title: "Introduction to Pharmacology",
+    subject: "Pharmacology",
+    description: "Drug actions, pharmacokinetics and drug classifications.",
+    file: "pdfs/pharmacology.pdf"
+  },
+  {
+    title: "Medical Microbiology",
+    subject: "Microbiology",
+    description: "Microorganisms, infection and disease.",
+    file: "pdfs/microbiology.pdf"
+  },
+  {
+    title: "Clinical Medicine Revision",
+    subject: "Clinical Medicine",
+    description: "Foundations of clinical assessment and medical reasoning.",
+    file: "pdfs/clinical-medicine.pdf"
+  },
+  {
+    title: "Medical Biochemistry",
+    subject: "Biochemistry",
+    description: "Enzymes, metabolism and important biochemical pathways.",
+    file: "pdfs/biochemistry.pdf"
+  },
+  {
+    title: "Medical Revision Questions",
+    subject: "Clinical Medicine",
+    description: "A place for your own legally shareable revision papers.",
+    file: "pdfs/revision-questions.pdf"
+  }
+];
+
+/*
+  SAMPLE EDUCATIONAL MCQs.
+  These questions are illustrative, not a validated exam bank.
+  Correct answer is the zero-based index of the options array.
+*/
+const questions = [
+  {
+    subject: "Anatomy",
+    q: "Which is the longest bone in the human body?",
+    options: ["Tibia", "Femur", "Humerus", "Fibula"],
+    answer: 1,
+    explanation: "The femur is the longest bone in the human body."
+  },
+  {
+    subject: "Anatomy",
+    q: "Which chamber pumps blood into the pulmonary artery?",
+    options: ["Left atrium", "Left ventricle", "Right ventricle", "Right atrium"],
+    answer: 2,
+    explanation: "The right ventricle pumps blood toward the lungs through the pulmonary artery."
+  },
+  {
+    subject: "Anatomy",
+    q: "Which cranial nerve is primarily responsible for the sense of smell?",
+    options: ["Optic nerve", "Olfactory nerve", "Facial nerve", "Vagus nerve"],
+    answer: 1,
+    explanation: "Cranial nerve I, the olfactory nerve, carries sensory information for smell."
+  },
+  {
+    subject: "Anatomy",
+    q: "How many cervical vertebrae are typically present in humans?",
+    options: ["5", "7", "12", "8"],
+    answer: 1,
+    explanation: "Humans typically have seven cervical vertebrae."
+  },
+  {
+    subject: "Anatomy",
+    q: "Which organ produces bile?",
+    options: ["Pancreas", "Spleen", "Liver", "Gallbladder"],
+    answer: 2,
+    explanation: "The liver produces bile; the gallbladder stores and concentrates it."
+  },
+  {
+    subject: "Physiology",
+    q: "Which hormone helps lower blood glucose?",
+    options: ["Glucagon", "Insulin", "Cortisol", "Adrenaline"],
+    answer: 1,
+    explanation: "Insulin promotes glucose uptake and storage, lowering blood glucose."
+  },
+  {
+    subject: "Physiology",
+    q: "Which blood component primarily transports oxygen?",
+    options: ["Platelets", "Red blood cells", "Plasma proteins", "Neutrophils"],
+    answer: 1,
+    explanation: "Haemoglobin in red blood cells carries most oxygen in the blood."
+  },
+  {
+    subject: "Physiology",
+    q: "What is the usual primary pacemaker of the heart?",
+    options: ["AV node", "SA node", "Bundle branches", "Purkinje fibres"],
+    answer: 1,
+    explanation: "The sinoatrial node normally initiates the heartbeat."
+  },
+  {
+    subject: "Physiology",
+    q: "Which organ is principally responsible for filtering blood to form urine?",
+    options: ["Liver", "Kidney", "Lung", "Pancreas"],
+    answer: 1,
+    explanation: "The kidneys filter blood and regulate fluid and electrolyte balance."
+  },
+  {
+    subject: "Physiology",
+    q: "Which gas is primarily removed from the body through the lungs?",
+    options: ["Nitrogen", "Carbon dioxide", "Helium", "Hydrogen"],
+    answer: 1,
+    explanation: "Carbon dioxide produced by metabolism is eliminated through ventilation."
+  },
+  {
+    subject: "Pathology",
+    q: "What is programmed, regulated cell death called?",
+    options: ["Necrosis", "Apoptosis", "Hypertrophy", "Dysplasia"],
+    answer: 1,
+    explanation: "Apoptosis is a regulated process of cell death."
+  },
+  {
+    subject: "Pathology",
+    q: "Which cells are important early responders in acute bacterial inflammation?",
+    options: ["Neutrophils", "Erythrocytes", "Osteocytes", "Adipocytes"],
+    answer: 0,
+    explanation: "Neutrophils are important early responders in acute inflammation, especially bacterial infection."
+  },
+  {
+    subject: "Pathology",
+    q: "An increase in the size of individual cells is called:",
+    options: ["Hyperplasia", "Hypertrophy", "Atrophy", "Metaplasia"],
+    answer: 1,
+    explanation: "Hypertrophy means increased cell size; hyperplasia means increased cell number."
+  },
+  {
+    subject: "Pathology",
+    q: "Which term describes tissue death caused by irreversible injury?",
+    options: ["Necrosis", "Metaplasia", "Hyperplasia", "Regeneration"],
+    answer: 0,
+    explanation: "Necrosis is cell or tissue death associated with irreversible injury."
+  },
+  {
+    subject: "Pharmacology",
+    q: "Penicillins act primarily by inhibiting:",
+    options: ["Protein synthesis at 30S", "Cell-wall synthesis", "Folate absorption", "Human DNA synthesis"],
+    answer: 1,
+    explanation: "Penicillins inhibit bacterial cell-wall synthesis by targeting penicillin-binding proteins."
+  },
+  {
+    subject: "Pharmacology",
+    q: "Which route of administration delivers a drug directly into a vein?",
+    options: ["Oral", "Intramuscular", "Intravenous", "Subcutaneous"],
+    answer: 2,
+    explanation: "Intravenous administration delivers a drug directly into the bloodstream through a vein."
+  },
+  {
+    subject: "Pharmacology",
+    q: "Pharmacokinetics primarily describes:",
+    options: [
+      "What a drug does to the body",
+      "What the body does to a drug",
+      "How diseases spread",
+      "How antibodies are formed"
+    ],
+    answer: 1,
+    explanation: "Pharmacokinetics includes absorption, distribution, metabolism and excretion."
+  },
+  {
+    subject: "Microbiology",
+    q: "Which organism causes malaria?",
+    options: ["Plasmodium", "Candida", "Staphylococcus", "Giardia"],
+    answer: 0,
+    explanation: "Malaria is caused by Plasmodium parasites transmitted by infected female Anopheles mosquitoes."
+  },
+  {
+    subject: "Microbiology",
+    q: "Which structure is a major target of many beta-lactam antibiotics?",
+    options: ["Human mitochondria", "Bacterial cell wall", "Viral envelope only", "Human ribosomes"],
+    answer: 1,
+    explanation: "Beta-lactam antibiotics inhibit bacterial cell-wall synthesis."
+  },
+  {
+    subject: "Microbiology",
+    q: "Which type of organism is Candida albicans?",
+    options: ["Bacterium", "Fungus", "Virus", "Helminth"],
+    answer: 1,
+    explanation: "Candida albicans is a yeast, which is a type of fungus."
+  },
+  {
+    subject: "Clinical Medicine",
+    q: "Which instrument is commonly used to measure blood pressure?",
+    options: ["Otoscope", "Sphygmomanometer", "Spirometer", "Ophthalmoscope"],
+    answer: 1,
+    explanation: "A sphygmomanometer measures blood pressure, typically using an inflatable cuff."
+  },
+  {
+    subject: "Clinical Medicine",
+    q: "Which vital sign measures the number of heartbeats per minute?",
+    options: ["Respiratory rate", "Pulse rate", "Temperature", "Oxygen saturation"],
+    answer: 1,
+    explanation: "Pulse rate records the number of palpable arterial pulses per minute."
+  },
+  {
+    subject: "Clinical Medicine",
+    q: "What is a patient's presenting complaint?",
+    options: [
+      "The reason they seek medical attention",
+      "The final laboratory result",
+      "The list of hospital staff",
+      "The discharge prescription"
+    ],
+    answer: 0,
+    explanation: "The presenting complaint is the main symptom or concern that brings the patient for care."
+  },
+  {
+    subject: "Biochemistry",
+    q: "Which molecule is the main immediate energy currency of cells?",
+    options: ["DNA", "ATP", "Urea", "Cholesterol"],
+    answer: 1,
+    explanation: "ATP transfers usable chemical energy for many cellular processes."
+  },
+  {
+    subject: "Biochemistry",
+    q: "Which enzyme breaks down starch into smaller carbohydrates in saliva?",
+    options: ["Pepsin", "Salivary amylase", "Lipase", "Trypsin"],
+    answer: 1,
+    explanation: "Salivary amylase begins the digestion of starch in the mouth."
+  },
+  {
+    subject: "Biochemistry",
+    q: "Which vitamin is required for normal collagen hydroxylation?",
+    options: ["Vitamin A", "Vitamin C", "Vitamin D", "Vitamin K"],
+    answer: 1,
+    explanation: "Vitamin C is a cofactor in collagen hydroxylation."
+  }
+];
+
+// ---------- STUDY RESOURCE SEARCH AND FILTERS ----------
+
+const resourceSearch = document.getElementById("resource-search");
+const resourceGrid = document.getElementById("resource-grid");
+const resourceFilters = document.getElementById("resource-filters");
+const resourceCount = document.getElementById("resource-count");
+
+const resourceSubjects = [
+  "All",
+  ...new Set(resources.map(item => item.subject))
+];
+
+let selectedResourceSubject = "All";
+
+resourceSubjects.forEach(subject => {
+  const button = document.createElement("button");
+  button.className = "chip";
+  button.textContent = subject;
+  button.type = "button";
+  button.classList.toggle("active", subject === "All");
+
+  button.addEventListener("click", () => {
+    selectedResourceSubject = subject;
+
+    resourceFilters.querySelectorAll("button").forEach(btn => {
+      btn.classList.toggle("active", btn === button);
+    });
+
+    renderResources();
+  });
+
+  resourceFilters.appendChild(button);
+});
+
+function renderResources() {
+  const term = resourceSearch.value.toLowerCase().trim();
+
+  const filtered = resources.filter(item => {
+    const subjectMatches =
+      selectedResourceSubject === "All" ||
+      item.subject === selectedResourceSubject;
+
+    const textMatches =
+      (item.title + " " + item.subject + " " + item.description)
+        .toLowerCase().includes(term);
+
+    return subjectMatches && textMatches;
+  });
+
+  resourceCount.textContent = filtered.length + " resource(s) found";
+  resourceGrid.replaceChildren();
+
+  if (filtered.length === 0) {
+    resourceGrid.textContent = "No resources found. Try another search.";
+    return;
+  }
+
+  filtered.forEach(item => {
+    const card = document.createElement("article");
+    card.className = "card";
+
+    const tag = document.createElement("span");
+    tag.className = "tag";
+    tag.textContent = item.subject;
+
+    const title = document.createElement("h3");
+    title.textContent = item.title;
+
+    const description = document.createElement("p");
+    description.textContent = item.description;
+
+    const link = document.createElement("a");
+    link.href = item.file;
+    link.textContent = "Open / Download PDF →";
+
+    card.append(tag, title, description, link);
+    resourceGrid.appendChild(card);
+  });
+}
+
+resourceSearch.addEventListener("input", renderResources);
+renderResources();
+
+// ---------- MCQ QUIZ AND AUTOMATIC MARKING ----------
+
+const subjectSelect = document.getElementById("mcq-subject");
+const limitSelect = document.getElementById("question-limit");
+const quizContainer = document.getElementById("quiz-container");
+const submitButton = document.getElementById("submit-quiz");
+const nextButton = document.getElementById("next-quiz");
+const quizResult = document.getElementById("quiz-result");
+const quizProgress = document.getElementById("quiz-progress");
+
+let currentQuestions = [];
+let submitted = false;
+
+function shuffle(items) {
+  const result = [...items];
+
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+
+  return result;
+}
+
+function loadQuiz() {
+  submitted = false;
+  quizResult.textContent = "";
+  quizContainer.replaceChildren();
+
+  submitButton.hidden = false;
+  submitButton.disabled = false;
+  nextButton.hidden = true;
+
+  const subject = subjectSelect.value;
+
+  const available = questions.filter(item =>
+    subject === "All" || item.subject === subject
+  );
+
+  if (available.length === 0) {
+    quizProgress.textContent = "No questions available for this subject yet.";
+    submitButton.hidden = true;
+    return;
+  }
+
+  const limit = limitSelect.value === "all"
+    ? available.length
+    : Number(limitSelect.value);
+
+  currentQuestions = shuffle(available).slice(0, limit);
+
+  quizProgress.textContent =
+    currentQuestions.length + " questions in this quiz";
+
+  currentQuestions.forEach((item, index) => {
+    const card = document.createElement("article");
+    card.className = "question";
+
+    const heading = document.createElement("h3");
+    heading.textContent = (index + 1) + ". " + item.q;
+
+    const category = document.createElement("p");
+    category.className = "tag";
+    category.textContent = item.subject;
+
+    card.append(category, heading);
+
+    // Shuffle the answer positions without losing the correct answer.
+    const shuffledOptions = shuffle(
+      item.options.map((text, originalIndex) => ({
+        text,
+        originalIndex
+      }))
+    );
+
+    shuffledOptions.forEach((option, optionIndex) => {
+      const label = document.createElement("label");
+      label.className = "option";
+
+      const radio = document.createElement("input");
+      radio.type = "radio";
+      radio.name = "question-" + index;
+      radio.value = String(option.originalIndex);
+
+      const text = document.createElement("span");
+      text.textContent =
+        String.fromCharCode(65 + optionIndex) + ". " + option.text;
+
+      label.append(radio, text);
+      card.appendChild(label);
+    });
+
+    const feedback = document.createElement("div");
+    feedback.className = "feedback";
+    feedback.hidden = true;
+    card.appendChild(feedback);
+
+    quizContainer.appendChild(card);
+  });
+}
+
+function submitQuiz() {
+  if (submitted) return;
+
+  const unanswered = currentQuestions.some((item, index) => {
+    return !quizContainer.querySelector(
+      'input[name="question-' + index + '"]:checked'
+    );
+  });
+
+  if (unanswered) {
+    quizResult.textContent =
+      "Please answer every question before submitting.";
+    return;
+  }
+
+  submitted = true;
+  let score = 0;
+
+  currentQuestions.forEach((item, index) => {
+    const card = quizContainer.children[index];
+
+    const selected = card.querySelector(
+      'input[name="question-' + index + '"]:checked'
+    );
+
+    const selectedAnswer = Number(selected.value);
+    const isCorrect = selectedAnswer === item.answer;
+
+    if (isCorrect) score++;
+
+    card.querySelectorAll(".option").forEach(label => {
+      const radio = label.querySelector("input");
+      const optionIndex = Number(radio.value);
+
+      radio.disabled = true;
+
+      if (optionIndex === item.answer) {
+        label.classList.add("correct");
+      }
+
+      if (radio.checked && !isCorrect) {
+        label.classList.add("wrong");
+      }
+    });
+
+    const feedback = card.querySelector(".feedback");
+    feedback.hidden = false;
+
+    const title = document.createElement("strong");
+    title.textContent = isCorrect
+      ? "Correct answer!"
+      : "Incorrect answer.";
+
+    const explanation = document.createElement("p");
+    explanation.textContent =
+      "Correct answer: " + item.options[item.answer] +
+      ". " + item.explanation;
+
+    feedback.append(title, explanation);
+  });
+
+  const percentage = Math.round(
+    (score / currentQuestions.length) * 100
+  );
+
+  quizResult.textContent =
+    "Your score: " + score + "/" + currentQuestions.length +
+    " (" + percentage + "%)";
+
+  quizProgress.textContent =
+    "Quiz completed. Review the explanations above.";
+
+  submitButton.disabled = true;
+  nextButton.hidden = false;
+}
+
+submitButton.addEventListener("click", submitQuiz);
+nextButton.addEventListener("click", loadQuiz);
+subjectSelect.addEventListener("change", loadQuiz);
+limitSelect.addEventListener("change", loadQuiz);
+
+document.getElementById("resource-total").textContent =
+  resources.length;
+
+document.getElementById("question-total").textContent =
+  questions.length;
+
+document.getElementById("year").textContent =
+  new Date().getFullYear();
+
+loadQuiz();
+</script>
+</body>
+</html>

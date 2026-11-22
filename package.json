@@ -9,6 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@daily-co/daily-js": "^0.94.0",
+    "@supabase/server": "^1.9.2",
+    "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.118.0",
     "lucide-react": "^0.468.0",
     "next": "^14.2.30",
