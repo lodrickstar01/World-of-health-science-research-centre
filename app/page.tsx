@@ -1,4 +1,4 @@
-
+﻿
 "use client";
 
 import { useEffect, useState } from "react";
@@ -379,8 +379,8 @@ export default function MedicalLibraryPage() {
       `}</style>
 
       <header className="header">
-        <strong>⚕ Medical Research Centre</strong>
-        <p>Learn • Research • Advance</p>
+        <strong>âš• Medical Research Centre</strong>
+        <p>Learn â€¢ Research â€¢ Advance</p>
         <nav
           aria-label="Main navigation"
           style={{
@@ -430,7 +430,7 @@ export default function MedicalLibraryPage() {
               Explore learning resources, organise your notes and practise
               medical questions across six subjects.
             </p>
-            <a className="btn" href="#library">Explore library ↓</a>
+            <a className="btn" href="#library">Explore library â†“</a>
           </div>
 
           <div className="panel" id="membership">
@@ -481,7 +481,7 @@ export default function MedicalLibraryPage() {
               <article className="item" key={item.title}>
                 <span className="tag">{item.access}</span>
                 <h3>{item.title}</h3>
-                <p>{item.subject} • {item.type}</p>
+                <p>{item.subject} â€¢ {item.type}</p>
                 <p>{item.description}</p>
               
 <a
@@ -610,7 +610,7 @@ export default function MedicalLibraryPage() {
         <section className="panel" id="mcqs">
           <h2>MCQ Practice</h2>
           <p className="muted">
-            Question {questionIndex + 1} of {questions.length} • {currentQuestion.subject}
+            Question {questionIndex + 1} of {questions.length} â€¢ {currentQuestion.subject}
           </p>
           <h3>{currentQuestion.question}</h3>
 
@@ -645,7 +645,7 @@ export default function MedicalLibraryPage() {
                   setAnswer(null);
                 }}
               >
-                Next question →
+                Next question â†’
               </button>
             </div>
           )}
@@ -662,7 +662,7 @@ export default function MedicalLibraryPage() {
       </div>
 
       <footer className="footer">
-        Medical Research Centre • Learn • Research • Advance
+        Medical Research Centre â€¢ Learn â€¢ Research â€¢ Advance
       </footer>
       
 <section
@@ -705,6 +705,9 @@ export default function MedicalLibraryPage() {
   </p>
 </section>
 
-    </main>
+    
+<a href="/live-study-chart" className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700">Live Study Chart</a>
+</main>
   );
 }
+
